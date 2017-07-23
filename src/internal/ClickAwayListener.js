@@ -10,10 +10,6 @@ const isDescendant = (el, target) => {
   return false;
 };
 
-const clickAwayEvents = ['mouseup', 'touchend'];
-const bind = (callback) => clickAwayEvents.forEach((event) => events.on(document, event, callback));
-const unbind = (callback) => clickAwayEvents.forEach((event) => events.off(document, event, callback));
-
 class ClickAwayListener extends Component {
   static propTypes = {
     children: PropTypes.element,
@@ -22,23 +18,38 @@ class ClickAwayListener extends Component {
 
   componentDidMount() {
     this.isCurrentlyMounted = true;
-    if (this.props.onClickAway) {
-      bind(this.handleClickAway);
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.onClickAway !== this.props.onClickAway) {
-      unbind(this.handleClickAway);
-      if (this.props.onClickAway) {
-        bind(this.handleClickAway);
-      }
-    }
+    events.on(document, 'mouseup', this.handleMouseUp);
+    events.on(document, 'touchstart', this.handleTouchStart);
+    events.on(document, 'touchmove', this.handleTouchMove);
+    events.on(document, 'touchend', this.handleTouchEnd);
   }
 
   componentWillUnmount() {
     this.isCurrentlyMounted = false;
-    unbind(this.handleClickAway);
+    events.off(document, 'mouseup', this.handleMouseUp);
+    events.off(document, 'touchstart', this.handleTouchStart);
+    events.off(document, 'touchmove', this.handleTouchMove);
+    events.off(document, 'touchend', this.handleTouchEnd);
+  }
+
+  handleMouseUp = (event) => {
+    this.handleClickAway(event);
+  }
+
+  handleTouchStart = () => {
+    this.touchMoved = false;
+  }
+
+  handleTouchMove = () => {
+    this.touchMoved = true;
+  }
+
+  handleTouchEnd = (event) => {
+    if (this.touchMoved) {
+      return;
+    }
+
+    this.handleClickAway(event);
   }
 
   handleClickAway = (event) => {
