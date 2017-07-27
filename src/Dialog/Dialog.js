@@ -218,8 +218,8 @@ class DialogInline extends Component {
     const container = ReactDOM.findDOMNode(this);
     const dialogWindow = ReactDOM.findDOMNode(this.refs.dialogWindow);
     const dialogContent = ReactDOM.findDOMNode(this.refs.dialogContent);
-    const minPaddingTop = 16;
     const verticalSpace = getVerticalSpace(this.props, this.context);
+    const minPaddingTop = Math.min(16, verticalSpace);
 
     // Reset the height in case the window was resized.
     dialogWindow.style.height = '';
