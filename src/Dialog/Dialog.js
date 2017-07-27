@@ -266,6 +266,10 @@ class DialogInline extends Component {
     this.positionDialog();
   };
 
+  handleOrientationChange = () => {
+    this.positionDialog();
+  };
+
   render() {
     const {
       actions,
@@ -325,6 +329,7 @@ class DialogInline extends Component {
             target="window"
             onKeyUp={this.handleKeyUp}
             onResize={this.handleResize}
+            onOrientationChange={this.handleOrientationChange}
           />
         }
         <ReactTransitionGroup
