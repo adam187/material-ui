@@ -10,10 +10,21 @@ import Paper from '../Paper';
 
 import ReactTransitionGroup from 'react-transition-group/TransitionGroup';
 
+function getVerticalSpace (props, context) {
+  const spacing = context.muiTheme.baseTheme.spacing;
+
+  if (props.verticalSpace !== undefined) {
+    return props.verticalSpace;
+  }
+
+  return spacing.desktopKeylineIncrement;
+}
+
 class TransitionItem extends Component {
   static propTypes = {
     children: PropTypes.node,
     style: PropTypes.object,
+    verticalSpace: PropTypes.number,
   };
 
   static contextTypes = {
@@ -34,12 +45,12 @@ class TransitionItem extends Component {
   }
 
   componentWillAppear(callback) {
-    const spacing = this.context.muiTheme.baseTheme.spacing;
+    const verticalSpace = getVerticalSpace(this.props, this.context);
 
     this.setState({
       style: {
         opacity: 1,
-        transform: `translate(0, ${spacing.desktopKeylineIncrement}px)`,
+        transform: `translate(0, ${verticalSpace}px)`,
       },
     });
 
@@ -61,6 +72,7 @@ class TransitionItem extends Component {
     const {
       style,
       children,
+      verticalSpace,
       ...other
     } = this.props;
 
@@ -207,13 +219,14 @@ class DialogInline extends Component {
     const dialogWindow = ReactDOM.findDOMNode(this.refs.dialogWindow);
     const dialogContent = ReactDOM.findDOMNode(this.refs.dialogContent);
     const minPaddingTop = 16;
+    const verticalSpace = getVerticalSpace(this.props, this.context);
 
     // Reset the height in case the window was resized.
     dialogWindow.style.height = '';
     dialogContent.style.height = '';
 
     const dialogWindowHeight = dialogWindow.offsetHeight;
-    let paddingTop = ((clientHeight - dialogWindowHeight) / 2) - 64;
+    let paddingTop = ((clientHeight - dialogWindowHeight) / 2) - verticalSpace;
     if (paddingTop < minPaddingTop) paddingTop = minPaddingTop;
 
     // Vertically center the dialog window, but make sure it doesn't
@@ -226,7 +239,7 @@ class DialogInline extends Component {
     if (autoDetectWindowHeight || autoScrollBodyContent) {
       const styles = getStyles(this.props, this.context);
       styles.body = Object.assign(styles.body, bodyStyle);
-      let maxDialogContentHeight = clientHeight - 2 * 64;
+      let maxDialogContentHeight = clientHeight - 2 * verticalSpace;
 
       if (title) maxDialogContentHeight -= dialogContent.previousSibling.offsetHeight;
 
@@ -286,6 +299,7 @@ class DialogInline extends Component {
       titleClassName,
       titleStyle,
       title,
+      verticalSpace,
     } = this.props;
 
     const {prepareStyles} = this.context.muiTheme;
@@ -339,6 +353,7 @@ class DialogInline extends Component {
             <TransitionItem
               className={contentClassName}
               style={styles.content}
+              verticalSpace={verticalSpace}
             >
               <Paper className={paperClassName} zDepth={4} {...paperProps}>
                 {titleElement}
@@ -464,6 +479,10 @@ class Dialog extends Component {
      * Overrides the inline-styles of the title's root container element.
      */
     titleStyle: PropTypes.object,
+    /**
+     * Vertical space between dialog and browser edge
+     */
+    verticalSpace: PropTypes.number,
   };
 
   static contextTypes = {
