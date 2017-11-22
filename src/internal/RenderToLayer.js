@@ -22,6 +22,7 @@ class RenderToLayer extends Component {
   };
 
   componentDidMount() {
+    this.isCurrentlyMounted = true;
     this.renderLayer();
   }
 
@@ -30,10 +31,15 @@ class RenderToLayer extends Component {
   }
 
   componentWillUnmount() {
+    this.isCurrentlyMounted = false;
     this.unrenderLayer();
   }
 
   onClickAway = (event) => {
+    if (!this.isCurrentlyMounted) {
+      return;
+    }
+
     if (event.defaultPrevented) {
       return;
     }
